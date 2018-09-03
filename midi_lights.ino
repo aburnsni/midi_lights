@@ -1,12 +1,18 @@
 #include <MIDI.h>
 #include <NeoPixelBus.h>
+#include <SoftwareSerial.h>
+
+const int DEBUG=0;
+
+// SoftwareSerial mySerial(10,11);
+// MIDI_CREATE_INSTANCE(SoftwareSerial, mySerial, MIDI);
 
 MIDI_CREATE_DEFAULT_INSTANCE();
 
 #define LED LED_BUILTIN
 
 //NeoPixel Setup
-const uint16_t PixelCount = 8;
+const uint16_t PixelCount = 7;
 const uint8_t PixelPin = 3;
 // #define brightness 0.7 // Between 0 and 1
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PixelCount, PixelPin);
@@ -18,7 +24,16 @@ int note;
 
 void setup()  {
   pinMode(LED, OUTPUT);
+
+  for (int i = 5; i <= 12; i++) {
+    pinMode(i, INPUT_PULLUP);
+    pinMode(i, OUTPUT); // defaults HIGH (relays off)
+  }
+
   MIDI.begin(MIDI_CHANNEL_OMNI);
+  if (DEBUG) {
+    Serial.begin(115200);
+  }
   // By default, the MIDI library sends everything THRU. We do NOT want that! 
   MIDI.turnThruOff();
 
@@ -36,6 +51,7 @@ void loop() {
 
 void HandleNoteOn(byte channel, byte pitch, byte velocity) {
   note = pitch - 60;  //  C=0 D=2 E=4 F=5 G=7 A=9 B=11
+  note = pitch % 12;
   switch (note) {
     case 0:
       turnOnLED(0,velocity);
@@ -63,8 +79,8 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity) {
   }
 }
 void HandleNoteOff(byte channel, byte pitch, byte velocity) {
-//   note = pitch % 12;  //  C=0 D=2 E=4 F=5 G=7 A=9 B=11
-  note = pitch - 60;
+  note = pitch % 12;  //  C=0 D=2 E=4 F=5 G=7 A=9 B=11
+  // note = pitch - 60;
   switch (note) {
     case 0:
       turnOffLED(0);
@@ -93,15 +109,32 @@ void HandleNoteOff(byte channel, byte pitch, byte velocity) {
 }
 
 void turnOnLED( int led, int brightness ) {
-  RgbColor updatecolor(brightness*2);
+  // RgbColor updatecolor(brightness*2);
+
+  float ledHue = (float)led/(float)PixelCount;
+  float ledSat = 1;
+  float ledLight = (float)brightness/254;
+  if (DEBUG) {
+    Serial.print(led);
+    Serial.print("\t");
+    Serial.print(ledHue);
+    Serial.print("\t");
+    Serial.print(ledSat);
+    Serial.print("\t");
+    Serial.println(ledLight);
+  }
+  HslColor updatecolor(ledHue, ledSat, ledLight);
+
   strip.SetPixelColor(led, updatecolor);
   strip.Show();
   delay(10);
+  digitalWrite(led+5, LOW);
 }
 void turnOffLED( int led ) {
   strip.SetPixelColor(led, black);
   strip.Show();
   delay(10);
+    digitalWrite(led+5, HIGH);
 }
 
 void BlinkLed(byte num) {
