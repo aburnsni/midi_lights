@@ -12,7 +12,7 @@ MIDI_CREATE_DEFAULT_INSTANCE();
 #define LED LED_BUILTIN
 
 //NeoPixel Setup
-const uint16_t PixelCount = 7;
+const uint16_t PixelCount = 12;
 const uint8_t PixelPin = 3;
 // #define brightness 0.7 // Between 0 and 1
 NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PixelCount, PixelPin);
@@ -50,62 +50,64 @@ void loop() {
 }
 
 void HandleNoteOn(byte channel, byte pitch, byte velocity) {
-  note = pitch - 60;  //  C=0 D=2 E=4 F=5 G=7 A=9 B=11
+//  note = pitch - 60;  //  C=0 D=2 E=4 F=5 G=7 A=9 B=11
   note = pitch % 12;
-  switch (note) {
-    case 0:
-      turnOnLED(0,velocity);
-      break;
-    case 2:
-      turnOnLED(1,velocity);
-      break;
-    case 4:
-      turnOnLED(2,velocity);
-      break;
-    case 5:
-      turnOnLED(3,velocity);
-      break;
-    case 7:
-      turnOnLED(4,velocity);
-      break;
-    case 9:
-      turnOnLED(5,velocity);
-      break;
-    case 11:
-      turnOnLED(6,velocity);
-      break;
-    case 12:
-      turnOnLED(7,velocity);
-  }
+  turnOnLED(note, velocity);
+//  switch (note) {
+//    case 0:
+//      turnOnLED(0,velocity);
+//      break;
+//    case 2:
+//      turnOnLED(1,velocity);
+//      break;
+//    case 4:
+//      turnOnLED(2,velocity);
+//      break;
+//    case 5:
+//      turnOnLED(3,velocity);
+//      break;
+//    case 7:
+//      turnOnLED(4,velocity);
+//      break;
+//    case 9:
+//      turnOnLED(5,velocity);
+//      break;
+//    case 11:
+//      turnOnLED(6,velocity);
+//      break;
+//    case 12:
+//      turnOnLED(7,velocity);
+//  }
 }
 void HandleNoteOff(byte channel, byte pitch, byte velocity) {
   note = pitch % 12;  //  C=0 D=2 E=4 F=5 G=7 A=9 B=11
   // note = pitch - 60;
-  switch (note) {
-    case 0:
-      turnOffLED(0);
-      break;
-    case 2:
-      turnOffLED(1);
-      break;
-    case 4:
-      turnOffLED(2);
-      break;
-    case 5:
-      turnOffLED(3);
-      break;
-    case 7:
-      turnOffLED(4);
-      break;
-    case 9:
-      turnOffLED(5);
-      break;
-    case 11:
-      turnOffLED(6);
-      break;
-    case 12:
-      turnOffLED(7);
-  }
+  turnOffLED(note);
+//  switch (note) {
+//    case 0:
+//      turnOffLED(0);
+//      break;
+//    case 2:
+//      turnOffLED(1);
+//      break;
+//    case 4:
+//      turnOffLED(2);
+//      break;
+//    case 5:
+//      turnOffLED(3);
+//      break;
+//    case 7:
+//      turnOffLED(4);
+//      break;
+//    case 9:
+//      turnOffLED(5);
+//      break;
+//    case 11:
+//      turnOffLED(6);
+//      break;
+//    case 12:
+//      turnOffLED(7);
+//  }
 }
 
 void turnOnLED( int led, int brightness ) {
