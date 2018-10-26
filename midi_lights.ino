@@ -21,6 +21,7 @@ NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> strip(PixelCount, PixelPin);
 RgbColor black(0);
 
 int note;
+int notePlaying[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
 
 void setup()  {
   pinMode(LED, OUTPUT);
@@ -52,7 +53,9 @@ void loop() {
 void HandleNoteOn(byte channel, byte pitch, byte velocity) {
 //  note = pitch - 60;  //  C=0 D=2 E=4 F=5 G=7 A=9 B=11
   note = pitch % 12;
-  turnOnLED(note, velocity);
+  notePlaying[note]++;
+  if (notePlaying) {
+    turnOnLED(note, velocity);
 //  switch (note) {
 //    case 0:
 //      turnOnLED(0,velocity);
@@ -78,11 +81,17 @@ void HandleNoteOn(byte channel, byte pitch, byte velocity) {
 //    case 12:
 //      turnOnLED(7,velocity);
 //  }
+  }
 }
 void HandleNoteOff(byte channel, byte pitch, byte velocity) {
   note = pitch % 12;  //  C=0 D=2 E=4 F=5 G=7 A=9 B=11
   // note = pitch - 60;
-  turnOffLED(note);
+  if (notePlaying[note]>0) {
+      notePlaying[note]--;
+  }
+  if (notePlaying[note]==0) {
+    turnOffLED(note);
+  }
 //  switch (note) {
 //    case 0:
 //      turnOffLED(0);
